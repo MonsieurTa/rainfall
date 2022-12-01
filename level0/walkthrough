@@ -1,0 +1,8 @@
+Use gdb to disassemble the binary.
+By reverse engineering the assembly code to C code,
+we can see that we need to enter "423" as first parameter of the binary.
+It is then converted by atoi to its int32 version and checked to either launch a new shell "/bin/sh"
+or write to stderr the following string "No !\n"
+
+Once in the new shell, run the following commnand to get the flag
+`cat /home/user/level1/.pass`
