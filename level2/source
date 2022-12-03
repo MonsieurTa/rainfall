@@ -1,0 +1,24 @@
+#include <string.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <stdint.h>
+
+void p() {
+	uint32_t eip;
+	char buffer[64];
+
+	fflush(stdout);
+	gets(buffer);
+	eip = *(uint32_t*)&buffer+64+12+4;
+	if ((eip & 0xb0000000) == 0xb0000000) {
+		printf("(%p)\n", eip);
+		exit(0x1);
+	} else {
+		puts(buffer);
+		strdup(buffer);
+	}
+}
+
+int main() {
+	p();
+}

