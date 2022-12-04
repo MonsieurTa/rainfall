@@ -1,0 +1,88 @@
+0x08048ec0 <+0>:	push   ebp                          ; prolog
+0x08048ec1 <+1>:	mov    ebp,esp                      ; prolog
+0x08048ec3 <+3>:	and    esp,0xfffffff0               ; align stack
+0x08048ec6 <+6>:	sub    esp,0x20                     ; sub the stack pointer by 32 bytes for local variables
+0x08048ec9 <+9>:	mov    eax,DWORD PTR [ebp+0xc]      ; move in eax the second argument (+12 bytes) (argv[0])
+0x08048ecc <+12>:	add    eax,0x4                      ; point eax on argv[1] (+4 bytes)
+0x08048ecf <+15>:	mov    eax,DWORD PTR [eax]          ; dereference argv[1] to its string
+0x08048ed1 <+17>:	mov    DWORD PTR [esp],eax          ; put argv[1] string to the stack (esp + 0)
+0x08048ed4 <+20>:	call   0x8049710 <atoi>             ; call atoi to convert first argument string to number
+                                                        ; [ARG 1]: argv[1] string
+0x08048ed9 <+25>:	cmp    eax,0x1a7                    ; compare the atoi result (eax) with 0x1a7 (423)
+0x08048ede <+30>:	jne    0x8048f58 <main+152>         ; jump to the end of the main if first argument
+                                                        ; not equal to 423
+0x08048ee0 <+32>:	mov    DWORD PTR [esp],0x80c5348    : else put the "/bin/sh" string address
+                                                        ; from the .rodata section in the stack (esp + 0)
+                                                        ; x/s 0x8050bf0 (to see the string)
+                                                        ; info files (to know where 0x8050bf0 is from) (.rodata)
+0x08048ee7 <+39>:	call   0x8050bf0 <strdup>           ; call strdup for copy the "/bin/sh" string
+                                                        ; [ARG 1]: "/bin/sh" string address
+0x08048eec <+44>:	mov    DWORD PTR [esp+0x10],eax     ; put the copied "/bin/sh" string in
+                                                        ; the stack frame (esp + 16)
+0x08048ef0 <+48>:	mov    DWORD PTR [esp+0x14],0x0     ; put 0x00 (null) to the stack frame (esp + 20)
+0x08048ef8 <+56>:	call   0x8054680 <getegid>          ; call getepid to get the
+                                                        ; [NO ARG]
+                                                        ; effective group ID of the calling process
+0x08048efd <+61>:	mov    DWORD PTR [esp+0x1c],eax     ; put the group ID to the stack frame (esp + 28)
+0x08048f01 <+65>:	call   0x8054670 <geteuid>          ; call geteuid to get the
+                                                        ; effective user ID of the calling process.
+                                                        ; [NO ARG]
+0x08048f06 <+70>:	mov    DWORD PTR [esp+0x18],eax     ; put the user ID to the stack frame (esp + 24)
+0x08048f0a <+74>:	mov    eax,DWORD PTR [esp+0x1c]     ; put the group ID from the stack to eax
+0x08048f0e <+78>:	mov    DWORD PTR [esp+0x8],eax      ; put the group ID from eax to the stack frame (esp + 8)
+                                                        : the third stack argument
+0x08048f12 <+82>:	mov    eax,DWORD PTR [esp+0x1c]     ; put the group ID from the stack to eax
+0x08048f16 <+86>:	mov    DWORD PTR [esp+0x4],eax      ; put the group ID from eax to the stack frame (esp + 4)
+                                                        : the second stack argument
+0x08048f1a <+90>:	mov    eax,DWORD PTR [esp+0x1c]     ; put the group ID from the stack to eax
+0x08048f1e <+94>:	mov    DWORD PTR [esp],eax          ; put the group ID from eax to the stack frame (esp + 0)
+                                                        ; the first stack argument
+0x08048f21 <+97>:	call   0x8054700 <setresgid>        ; call setresgid to sets the real user ID,
+                                                        ; the effective user ID, and the saved set-user-ID
+                                                        ; of the calling process
+                                                        ; [ARG 1]: the effective group ID of the calling process
+                                                        ; [ARG 2]: the effective group ID of the calling process
+                                                        ; [ARG 3]: the effective group ID of the calling process
+0x08048f26 <+102>:	mov    eax,DWORD PTR [esp+0x18]     ; put the user ID from the stack to eax
+0x08048f2a <+106>:	mov    DWORD PTR [esp+0x8],eax      ; put the user ID from eax to the stack frame (esp + 8)
+0x08048f2e <+110>:	mov    eax,DWORD PTR [esp+0x18]     ; put the user ID from the stack to eax
+0x08048f32 <+114>:	mov    DWORD PTR [esp+0x4],eax      ; put the user ID from eax to the stack frame (esp + 4)
+0x08048f36 <+118>:	mov    eax,DWORD PTR [esp+0x18]     ; put the user ID from the stack to eax
+0x08048f3a <+122>:	mov    DWORD PTR [esp],eax          ; put the user ID from eax to the stack frame (esp + 0)
+0x08048f3d <+125>:	call   0x8054690 <setresuid>        ; call setresuid to sets the real user ID,
+                                                        ; the effective user ID, and the saved set-user-ID of
+                                                        ; the calling process
+                                                        ; [ARG 1]: the effective user ID of the calling process
+                                                        ; [ARG 2]: the effective user ID of the calling process
+                                                        ; [ARG 3]: the effective user ID of the calling process
+0x08048f42 <+130>:	lea    eax,[esp+0x10]               ; put in eax the address of the "/bin/sh" string
+                                                        ; from the stack
+                                                        ; ! note this address is followed by 0x00 (esp+0x14)
+0x08048f46 <+134>:	mov    DWORD PTR [esp+0x4],eax      ; put the address of the "/bin/sh" string
+                                                        ; followed by 0x00 (see above)
+                                                        ; from eax to the stack frame (esp + 4)
+0x08048f4a <+138>:	mov    DWORD PTR [esp],0x80c5348    ; put the address of the "/bin/sh" string
+                                                        ; from the .rodata section to the stack frame (esp + 0)
+0x08048f51 <+145>:	call   0x8054640 <execv>            ; call execv for replace the current program
+                                                        ; by an another (here /bin/sh)
+                                                        ; [ARG 1]: the address of the "/bin/sh" string
+                                                        ; [ARG 2]: a pointer to the address of the "/bin/sh" string
+                                                        ; followed by 0x00
+0x08048f56 <+150>:	jmp    0x8048f80 <main+192>         ; jump to the end
+0x08048f58 <+152>:	mov    eax,ds:0x80ee170             ; get a stream structure pointer from data segment
+0x08048f5d <+157>:	mov    edx,eax                      ; put the stream structure from eax to edx
+0x08048f5f <+159>:	mov    eax,0x80c5350                ; put the string "No !\n" from the section .text to eax
+                                                        ; x/s 0x80c5350 (to see the string)
+                                                        ; info files (to know where 0x80c5350 is from) (.text)
+0x08048f64 <+164>:	mov    DWORD PTR [esp+0xc],edx      ; put the stream structure from edx to stack (esp + 12)
+0x08048f68 <+168>:	mov    DWORD PTR [esp+0x8],0x5      ; put the value 5 to stack (esp + 8)
+0x08048f70 <+176>:	mov    DWORD PTR [esp+0x4],0x1      ; put the value 1 to stack (esp + 4)
+0x08048f78 <+184>:	mov    DWORD PTR [esp],eax          ; put the the string "No !\n" from eax to stack (esp + 0)
+0x08048f7b <+187>:	call   0x804a230 <fwrite>           ; call fwrite to print a string
+                                                        ; [ARG 1]: the address of the "No !\n" string
+                                                        ; [ARG 2]: 1
+                                                        ; [ARG 2]: 5
+                                                        ; [ARG 2]: pointer to a stream structure
+0x08048f80 <+192>:	mov    eax,0x0                      ; set eax to 0 (return value)
+0x08048f85 <+197>:	leave                               ; copy ebp to esp and pop ebp
+0x08048f86 <+198>:	ret                                 ; return
