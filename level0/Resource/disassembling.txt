@@ -1,3 +1,4 @@
+; main
 0x08048ec0 <+0>:	push   ebp                          ; prolog
 0x08048ec1 <+1>:	mov    ebp,esp                      ; prolog
 0x08048ec3 <+3>:	and    esp,0xfffffff0               ; align stack
@@ -84,5 +85,5 @@
                                                         ; [ARG 2]: 5
                                                         ; [ARG 2]: pointer to a stream structure
 0x08048f80 <+192>:	mov    eax,0x0                      ; set eax to 0 (return value)
-0x08048f85 <+197>:	leave                               ; copy ebp to esp and pop ebp
+0x08048f85 <+197>:	leave                               ; copy ebp to esp and pop ebp (epilogue)
 0x08048f86 <+198>:	ret                                 ; return
