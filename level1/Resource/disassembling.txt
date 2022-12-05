@@ -14,20 +14,25 @@
 
 
 ; run
-0x08048444 <+0>:	push   ebp
-0x08048445 <+1>:	mov    ebp,esp
-0x08048447 <+3>:	sub    esp,0x18
-0x0804844a <+6>:	mov    eax,ds:0x80497c0
-0x0804844f <+11>:	mov    edx,eax
-0x08048451 <+13>:	mov    eax,0x8048570
-0x08048456 <+18>:	mov    DWORD PTR [esp+0xc],edx
-0x0804845a <+22>:	mov    DWORD PTR [esp+0x8],0x13
-0x08048462 <+30>:	mov    DWORD PTR [esp+0x4],0x1
-0x0804846a <+38>:	mov    DWORD PTR [esp],eax
-0x0804846d <+41>:	call   0x8048350 <fwrite@plt>       ; ...
-0x08048472 <+46>:	mov    DWORD PTR [esp],0x8048584    ; put the "/bin/sh" string adress to
+0x08048444 <+0>:	push   ebp                          ; prolog
+0x08048445 <+1>:	mov    ebp,esp                      ; prolog
+0x08048447 <+3>:	sub    esp,0x18                     ; sub the stack pointer by 24 bytes for local variables
+0x0804844a <+6>:	mov    eax,ds:0x80497c0             ; put the stdout structure to eax
+0x0804844f <+11>:	mov    edx,eax                      ; put the stdout structure from eax to edx
+0x08048451 <+13>:	mov    eax,0x8048570                ; put the "Good... Wait what?\n" string address to eax
+0x08048456 <+18>:	mov    DWORD PTR [esp+0xc],edx      ; put the stdout structure from edx to the stack (esp + 12)
+0x0804845a <+22>:	mov    DWORD PTR [esp+0x8],0x13     ; put 13 to the stack (esp + 8)
+0x08048462 <+30>:	mov    DWORD PTR [esp+0x4],0x1      ; put 1 to the stack (esp + 4)
+0x0804846a <+38>:	mov    DWORD PTR [esp],eax          ; put the "Good... Wait what?\n" string address from eax
+                                                        ; to the stack (esp + 0)
+0x0804846d <+41>:	call   0x8048350 <fwrite@plt>       ; call fwrite to write in stdout (arg 4)
+                                                        ; [ARG 1] "Good... Wait what?\n" string address
+                                                        ; [ARG 2] 13
+                                                        ; [ARG 3] 1
+                                                        ; [ARG 4] stdout structure
+0x08048472 <+46>:	mov    DWORD PTR [esp],0x8048584    ; put the "/bin/sh" string address to
                                                         ; the stack pointer (esp + 0)
 0x08048479 <+53>:	call   0x8048360 <system@plt>       ; call system fork and execute the command
                                                         ; [ARG 1] address to the "/bin/sh" string
-0x0804847e <+58>:	leave                               ; ...
-0x0804847f <+59>:	ret
+0x0804847e <+58>:	leave                               ; copy ebp to esp and pop ebp (epilogue)
+0x0804847f <+59>:	ret                                 ; return
