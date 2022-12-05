@@ -1,12 +1,8 @@
-```bash
-gdb ./level1
-```
-
-> Use __set disassembly-flavor intel__ command to set the intel syntax.
-
 ```gdb
 disass main
 ```
+
+> Use __set disassembly-flavor intel__ command to set the intel syntax.
 
 ```gdb
 Dump of assembler code for function main:
@@ -113,7 +109,7 @@ Check what is given as an argument to the *system* function:
 x/s 0x8048584
 ```
 
-```
+```gdb
 0x8048584:	 "/bin/sh"
 ```
 
@@ -123,14 +119,14 @@ Have to point the return address (eip register) saved in the stack of the the *m
 
 Let's check how many byte need to write in the stack to access to the return address:
 
-```
+```gdb
 b *0x08048490
 run
 x $esp
 info frame
 ```
 
-```
+```gdb
 ...
 0xbffff5e0:     0xbffff5f0
 ...
