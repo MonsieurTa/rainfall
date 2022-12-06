@@ -1,0 +1,55 @@
+; main
+0x0804853f <+0>:	push   ebp              ; prolog
+0x08048540 <+1>:	mov    ebp,esp          ; prolog
+0x08048542 <+3>:	and    esp,0xfffffff0   ; align stack 
+0x08048545 <+6>:	call   0x80484d4 <p>    ; call p function
+0x0804854a <+11>:	leave                   ; copy ebp to esp and pop ebp (epilogue)
+0x0804854b <+12>:	ret                     ; return
+
+; p
+0x080484d4 <+0>:	push   ebp                      ; prolog
+0x080484d5 <+1>:	mov    ebp,esp                  ; prolog
+0x080484d7 <+3>:	sub    esp,0x68                 ; sub the stack pointer by 104 bytes for local variables
+0x080484da <+6>:	mov    eax,ds:0x8049860         ; put the stdout structure to eax from the data section
+0x080484df <+11>:	mov    DWORD PTR [esp],eax      ; put the stdout structure from eax to
+                                                    ; the value of stack pointer (esp + 0)
+0x080484e2 <+14>:	call   0x80483b0 <fflush@plt>   ; call fflush to flush an output stream
+                                                    ; [ARG 1] stdout structure
+0x080484e7 <+19>:	lea    eax,[ebp-0x4c]           ; mov eax address to the stack (esp + 76)
+0x080484ea <+22>:	mov    DWORD PTR [esp],eax      ; mov the eax stack address in the stack (esp + 0)
+0x080484ed <+25>:	call   0x80483c0 <gets@plt>     ; call gets to get an user input and put it in the stack
+                                                    ; [ARG 1] address on the stack pointer where to write the input
+0x080484f2 <+30>:	mov    eax,DWORD PTR [ebp+0x4]  ; put the saved return address (eip) from the stack
+                                                    ; (ebp + 4) in eax
+0x080484f5 <+33>:	mov    DWORD PTR [ebp-0xc],eax  ; put the saved return address (eip) from eax
+                                                    : to the stack (ebp - 12)
+0x080484f8 <+36>:	mov    eax,DWORD PTR [ebp-0xc]  ; put the saved return address (eip) from the stack
+                                                    ; (ebp - 12) in eax
+0x080484fb <+39>:	and    eax,0xb0000000           ; apply AND mask on eax
+0x08048500 <+44>:	cmp    eax,0xb0000000           ; compare eax with a byte starting by 0xb
+                                                    ; to check if the saved return address has been modified
+                                                    ; by a potential overflow from the get call
+0x08048505 <+49>:	jne    0x8048527 <p+83>         ; if no equal (saved return address don't start by 0xb)
+                                                    ; jump to the end
+0x08048507 <+51>:	mov    eax,0x8048620            ; put the "(%p)\n" string address in eax
+0x0804850c <+56>:	mov    edx,DWORD PTR [ebp-0xc]  ; put the saved return address from
+                                                    ; stack (ebp - 12) to edx
+0x0804850f <+59>:	mov    DWORD PTR [esp+0x4],edx  ; put the saved return address from edx to th stack (esp + 4)
+0x08048513 <+63>:	mov    DWORD PTR [esp],eax      ; put the "(%p)\n" string address from eax in esp
+0x08048516 <+66>:	call   0x80483a0 <printf@plt>   ; call printf to rpint a string to stdout
+                                                    ; [ARG 1] "(%p)\n" string address
+                                                    ; [ARG 2] saved return address (eip)
+0x0804851b <+71>:	mov    DWORD PTR [esp],0x1      ; put 1 in the stack (esp + 0)
+0x08048522 <+78>:	call   0x80483d0 <_exit@plt>    ; call _exit to exit the program
+                                                    ; [ARG 1] 1
+0x08048527 <+83>:	lea    eax,[ebp-0x4c]           ; move the start of the input string (from gets) in eax
+0x0804852a <+86>:	mov    DWORD PTR [esp],eax      ; put the start of the input string (from gets) from eax
+                                                    ; in the stack (esp + 0)
+0x0804852d <+89>:	call   0x80483f0 <puts@plt>     ; call puts for print the input string
+                                                    ; [ARG 1] the address on the stack of the input string
+0x08048532 <+94>:	lea    eax,[ebp-0x4c]           ; move the start of the input string (from gets) in eax
+0x08048535 <+97>:	mov    DWORD PTR [esp],eax      ; put the start of the input string (from gets) from eax
+0x08048538 <+100>:	call   0x80483e0 <strdup@plt>   ; call strdup for copy the input string
+                                                    ; [ARG 1] the address on the stack of the input string
+0x0804853d <+105>:	leave                           ; copy ebp to esp and pop ebp (epilogue)
+0x0804853e <+106>:	ret                             ; return
