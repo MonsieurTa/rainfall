@@ -1,0 +1,59 @@
+; main
+0x0804851a <+0>:	push   ebp              ; prolog
+0x0804851b <+1>:	mov    ebp,esp          ; prolog
+0x0804851d <+3>:	and    esp,0xfffffff0   ; stack alignement
+0x08048520 <+6>:	call   0x80484a4 <v>    ; call v
+0x08048525 <+11>:	leave                   ; copy ebp to esp and pop ebp (epilogue)
+0x08048526 <+12>:	ret                     ; return
+
+; v
+0x080484a4 <+0>:	push   ebp                          ; prolog
+0x080484a5 <+1>:	mov    ebp,esp                      ; prolog
+0x080484a7 <+3>:	sub    esp,0x218                    ; sub the stack pointer by 536 bytes
+                                                        ; for local variables
+0x080484ad <+9>:	mov    eax,ds:0x8049860             ; put stdin stream structure in eax
+0x080484b2 <+14>:	mov    DWORD PTR [esp+0x8],eax      ; put stdin stream structure from eax
+                                                        ; in the stack (esp + 8)
+0x080484b6 <+18>:	mov    DWORD PTR [esp+0x4],0x200    ; put 512 in the stack (esp + 4)
+0x080484be <+26>:	lea    eax,[ebp-0x208]              ; put a stack address (esp - 520) in eax (buffer)
+0x080484c4 <+32>:	mov    DWORD PTR [esp],eax          ; put a stack address (esp - 520) from eax
+                                                        ; in the stack (esp + 0)
+0x080484c7 <+35>:	call   0x80483a0 <fgets@plt>        ; call fgets to read the user input
+                                                        ; [ARG 1] stack frame address pointing
+                                                        ;         where to store the user input (buffer)
+                                                        ; [ARG 2] the max size of the user input (512)
+                                                        ; [ARG 3] the stream structure (stdin) to read
+0x080484cc <+40>:	lea    eax,[ebp-0x208]              ; put a stack address (esp - 520) in eax (buffer)
+0x080484d2 <+46>:	mov    DWORD PTR [esp],eax          ; put a stack address (esp - 520) from eax
+0x080484d5 <+49>:	call   0x8048390 <printf@plt>       ; call printf to print in stdout
+                                                        ; [ARG 1] stack frame address pointing
+                                                        ;         where to store the user input (buffer)
+0x080484da <+54>:	mov    eax,ds:0x804988c             ; mov the global variable "m" to eax (value 0)
+                                                        ; x 0x804988c (what is)
+0x080484df <+59>:	cmp    eax,0x40                     ; compare eax (global variable "m") to 64
+0x080484e2 <+62>:	jne    0x8048518 <v+116>            ; jump to the end if not equal
+0x080484e4 <+64>:	mov    eax,ds:0x8049880             ; put stdout stream structure in eax
+0x080484e9 <+69>:	mov    edx,eax                      ; put stdout stream structure from eax in edx
+0x080484eb <+71>:	mov    eax,0x8048600                ; put the string "Wait what?!\n" from
+                                                        ; the section .rodata to eax
+                                                        ; x/s 0x80c5350 (to see the string)
+                                                        ; info files (to know where 0x8048600 is from) (.rodata)
+0x080484f0 <+76>:	mov    DWORD PTR [esp+0xc],edx      ; put stdout stream structure from edx
+                                                        ; in the stack (esp + 12)
+0x080484f4 <+80>:	mov    DWORD PTR [esp+0x8],0xc      ; put 12 in the stack (esp + 8)
+0x080484fc <+88>:	mov    DWORD PTR [esp+0x4],0x1      ; put 1 in the stack (esp + 4)
+0x08048504 <+96>:	mov    DWORD PTR [esp],eax          ; put the string "Wait what?!\n" from eax
+                                                        ; in the stack (esp + 0)
+0x08048507 <+99>:	call   0x80483b0 <fwrite@plt>       ; call fwrite to print to stdout
+                                                        ; [ARG 1] string "Wait what?!\n"
+                                                        ; [ARG 2] 1
+                                                        ; [ARG 3] 12
+                                                        ; [ARG 4] stdout stream structure pointer
+0x0804850c <+104>:	mov    DWORD PTR [esp],0x804860d    ; put the string "/bin/sh" from
+                                                        ; the section .rodata to the stack (esp + 0)
+                                                        ; x/s 0x80c5350 (to see the string)
+                                                        ; info files (to know where 0x804860d is from) (.rodata)
+0x08048513 <+111>:	call   0x80483c0 <system@plt>       ; call system fork and execute the command
+                                                        ; [ARG 1] address to the "/bin/sh" string
+0x08048518 <+116>:	leave                               ; copy ebp to esp and pop ebp (epilogue)
+0x08048519 <+117>:	ret                                 ; return
