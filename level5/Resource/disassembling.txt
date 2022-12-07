@@ -1,0 +1,45 @@
+; main
+0x08048504 <+0>:	push   ebp                          ; prolog
+0x08048505 <+1>:	mov    ebp,esp                      ; prolog
+0x08048507 <+3>:	and    esp,0xfffffff0               ; stack alignement
+0x0804850a <+6>:	call   0x80484c2 <n>                ; call n
+0x0804850f <+11>:	leave                               ; copy ebp to esp and pop ebp (epilogue)
+0x08048510 <+12>:	ret                                 ; return
+
+; n
+0x080484c2 <+0>:	push   ebp                          ; prolog
+0x080484c3 <+1>:	mov    ebp,esp                      ; prolog
+0x080484c5 <+3>:	sub    esp,0x218                    ; sub the stack pointer by 536 bytes
+                                                        ; for local variables
+0x080484cb <+9>:	mov    eax,ds:0x8049848             ; put stdin stream structure in eax
+0x080484d0 <+14>:	mov    DWORD PTR [esp+0x8],eax      ; put stdin stream structure from eax
+                                                        ; in the stack (esp + 8)
+0x080484d4 <+18>:	mov    DWORD PTR [esp+0x4],0x200    ; put 512 in the stack (esp + 4)
+0x080484dc <+26>:	lea    eax,[ebp-0x208]              ; put a stack address (esp - 520) in eax (buffer)
+0x080484e2 <+32>:	mov    DWORD PTR [esp],eax          ; put a stack address (esp - 520) from eax
+                                                        ; in the stack (esp + 0)
+0x080484e5 <+35>:	call   0x80483a0 <fgets@plt>        ; call fgets to read the user input
+                                                        ; [ARG 1] stack frame address pointing
+                                                        ;         where to store the user input (buffer)
+                                                        ; [ARG 2] the max size of the user input (512)
+                                                        ; [ARG 3] the stream structure (stdin) to read
+0x080484ea <+40>:	lea    eax,[ebp-0x208]              ; put a stack address (esp - 520) in eax (buffer)
+0x080484f0 <+46>:	mov    DWORD PTR [esp],eax          ; put a stack address (esp - 520) from eax
+0x080484f3 <+49>:	call   0x8048380 <printf@plt>       ; call printf to print in stdout
+                                                        ; [ARG 1] stack frame address pointing
+                                                        ;         where to store the user input (buffer)
+0x080484f8 <+54>:	mov    DWORD PTR [esp],0x1          ; put 1 in the stack (esp + 0)
+0x080484ff <+61>:	call   0x80483d0 <exit@plt>         ; call exit
+
+; o
+0x080484a4 <+0>:	push   ebp                          ; prolog
+0x080484a5 <+1>:	mov    ebp,esp                      ; prolog
+0x080484a7 <+3>:	sub    esp,0x18                     ; sub the stack pointer by 24 bytes
+0x080484aa <+6>:	mov    DWORD PTR [esp],0x80485f0    ; put the string "/bin/sh" from
+                                                        ; the section .rodata to the stack (esp + 0)
+                                                        ; x/s 0x80485f0 (to see the string)
+                                                        ; info files (to know where 0x80485f0 is from) (.rodata)
+0x080484b1 <+13>:	call   0x80483b0 <system@plt>       ; call system fork and execute the command
+                                                        ; [ARG 1] address to the "/bin/sh" string
+0x080484b6 <+18>:	mov    DWORD PTR [esp],0x1          ; put 1 in the stack (esp + 0)
+0x080484bd <+25>:	call   0x8048390 <_exit@plt>        ; call _exit
