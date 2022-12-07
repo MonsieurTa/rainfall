@@ -1,14 +1,14 @@
 Execute the *level2* binary:
 
 ```bash
-./level1
+./level2
 abcd
 ```
 
 ```
 ```
 
-> Note the *level2* binary read user input from stdin like the *level1*.
+> Note the *level2* binary reads the user input from stdin like the *level1*.
 
 ```gdb
 disass main

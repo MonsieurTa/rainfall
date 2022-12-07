@@ -4,7 +4,7 @@ Execute the *level1* binary:
 ./level0
 ```
 
-```bash
+```
 Segmentation fault (core dumped)
 ```
 
@@ -14,7 +14,7 @@ Segmentation fault (core dumped)
 ./level0 123
 ```
 
-```bash
+```
 No !
 ```
 
@@ -53,6 +53,6 @@ cat /home/user/level1/.pass
 exit
 ```
 
-```bash
+```
 1fe8a524fa4bec01ca4ea2a869af2a02260d4a7d5fe7e7c24d8617e6dca12d3a
 ```

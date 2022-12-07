@@ -8,7 +8,7 @@ abcd
 ```
 ```
 
-> Note the *level3* binary read user input from stdin like the *level1* and *level2*.
+> Note the *level3* binary reads the user input from stdin like the *level1* and *level2*.
 
 ```gdb
 disass main
@@ -37,16 +37,15 @@ disass v
 Dump of assembler code for function v:
 ...
    0x080484c4 <+32>:	mov    DWORD PTR [esp],eax
-   0x080484c7 <+35>:	call   0x80483a0 <fgets@plt>        ; get the user input
+   0x080484c7 <+35>:	call   0x80483a0 <fgets@plt>           ; get the user input
    0x080484cc <+40>:	lea    eax,[ebp-0x208]
    0x080484d2 <+46>:	mov    DWORD PTR [esp],eax
-   0x080484d5 <+49>:	call   0x8048390 <printf@plt>       ; print the user input
+   0x080484d5 <+49>:	call   0x8048390 <printf@plt>          ; print the user input
    0x080484da <+54>:	mov    eax,ds:0x804988c
-   0x080484df <+59>:	cmp    eax,0x40                     ; compare the "m" global variable to 64
+   0x080484df <+59>:	cmp    eax,0x40                        ; compare the "m" global variable to 64
    0x080484e2 <+62>:	jne    0x8048518 <v+116>
-   0x080484e4 <+64>:	mov    eax,ds:0x8049880
 ...
-   0x08048507 <+99>:	call   0x80483b0 <fwrite@plt>       ; print "Wait what?!\n"
+   0x08048507 <+99>:	call   0x80483b0 <fwrite@plt>          ; print "Wait what?!\n"
    0x0804850c <+104>:	mov    DWORD PTR [esp],0x804860d
    0x08048513 <+111>:	call   0x80483c0 <system@plt>       ; execute "/bin/sh"
 
