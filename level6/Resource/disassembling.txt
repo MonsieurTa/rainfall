@@ -1,0 +1,63 @@
+; main
+0x0804847c <+0>:	push   ebp                      ; prolog
+0x0804847d <+1>:	mov    ebp,esp                  ; prolog
+0x0804847f <+3>:	and    esp,0xfffffff0           ; stack alignement
+0x08048482 <+6>:	sub    esp,0x20                 ; sub the stack pointer by 32 bytes
+0x08048485 <+9>:	mov    DWORD PTR [esp],0x40     ; put 64 in the stack (esp + 0)
+0x0804848c <+16>:	call   0x8048350 <malloc@plt>   ; call malloc to alloc memory on the heap
+                                                    ; [ARG 1] length of 64 bytes
+0x08048491 <+21>:	mov    DWORD PTR [esp+0x1c],eax ; put the pointer from the return of malloc (eax)
+                                                    ; in the stack (esp + 28)
+0x08048495 <+25>:	mov    DWORD PTR [esp],0x4      ; put 4 in the stack (esp + 0)
+0x0804849c <+32>:	call   0x8048350 <malloc@plt>   ; call malloc to alloc memory on the heap
+                                                    ; [ARG 1] length of 4 bytes
+0x080484a1 <+37>:	mov    DWORD PTR [esp+0x18],eax ; put the pointer from the return of malloc (eax)
+                                                    ; in the stack (esp + 24)
+0x080484a5 <+41>:	mov    edx,0x8048468            ; put the address of the m function in edx
+                                                    ; (x/i 0x8048468  or  info functions)
+0x080484aa <+46>:	mov    eax,DWORD PTR [esp+0x18] ; put the return of the last malloc from the
+                                                    ; stack (esp + 24) in eax
+0x080484ae <+50>:	mov    DWORD PTR [eax],edx      ; put the address of the m function from edx in
+                                                    ; eax (the first byte of the last return of malloc)
+0x080484b0 <+52>:	mov    eax,DWORD PTR [ebp+0xc]  ; mov the argv[0] argument from the
+                                                    ; stack (ebp + 12) in eax
+0x080484b3 <+55>:	add    eax,0x4                  ; add 4 to eax for point on argv[1]
+0x080484b6 <+58>:	mov    eax,DWORD PTR [eax]      ; dereference the eax (argv[1])
+0x080484b8 <+60>:	mov    edx,eax                  ; put argv[1] from eax in edx
+0x080484ba <+62>:	mov    eax,DWORD PTR [esp+0x1c] ; put the pointer from the return of the
+                                                    ; first malloc in eax
+0x080484be <+66>:	mov    DWORD PTR [esp+0x4],edx  ; put argv[1] from edx in the stack (esp + 4)
+0x080484c2 <+70>:	mov    DWORD PTR [esp],eax      ; put the pointer from the return of the
+                                                    ; first malloc from eax in the stack (esp + 0)
+0x080484c5 <+73>:	call   0x8048340 <strcpy@plt>   ; call strcpy to copy the first malloc return
+                                                    ; [ARG 1] address returned from the first malloc (dest)
+                                                    ; [ARG 2] argv[1] (source)
+0x080484ca <+78>:	mov    eax,DWORD PTR [esp+0x18] ; put the pointer from the return of the
+                                                    ; first malloc in eax
+0x080484ce <+82>:	mov    eax,DWORD PTR [eax]      ; dereference the returned address from the first
+                                                    ; malloc in eax
+0x080484d0 <+84>:	call   eax                      ; call the function address stored in eax
+0x080484d2 <+86>:	leave                           ; copy ebp to esp and pop ebp (epilogue)
+0x080484d3 <+87>:	ret                             ; return
+
+; m
+0x08048468 <+0>:	push   ebp                          ; prolog
+0x08048469 <+1>:	mov    ebp,esp                      ; prolog
+0x0804846b <+3>:	sub    esp,0x18                     ; sub the stack pointer by 24 bytes
+0x0804846e <+6>:	mov    DWORD PTR [esp],0x80485d1    ; put the "Nope" string address in the stack (esp + 0)
+0x08048475 <+13>:	call   0x8048360 <puts@plt>         ; call puts to print the string
+                                                        ; [ARG 1] the "Nope" string address
+0x0804847a <+18>:	leave                               ; copy ebp to esp and pop ebp (epilogue)
+0x0804847b <+19>:	ret                                 ; return
+
+; n
+0x08048454 <+0>:	push   ebp                          ; prolog
+0x08048455 <+1>:	mov    ebp,esp                      ; prolog
+0x08048457 <+3>:	sub    esp,0x18
+0x0804845a <+6>:	mov    DWORD PTR [esp],0x80485b0    ; put the "/bin/cat /home/user/level7/.pass"
+                                                        ; string address in the stack (esp + 0)"
+0x08048461 <+13>:	call   0x8048370 <system@plt>       ; call system fork and execute the command
+                                                        ; [ARG 1] address to the
+                                                        ;           "/bin/cat /home/user/level7/.pass" string
+0x08048466 <+18>:	leave                               ; copy ebp to esp and pop ebp (epilogue)
+0x08048467 <+19>:	ret                                 ; return
