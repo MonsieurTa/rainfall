@@ -1,0 +1,36 @@
+#include <stdlib.h>
+#include <stdint.h>
+#include <stdio.h>
+#include <string.h>
+
+int main() {
+  char buffer[80];
+  void (*service)(); // 0x8049ab0
+  void (*auth)(); // 0x8049aac
+
+  while (true) {
+    printf("%p, %p \n", auth, service);
+    if (fgets(buffer, 0x80, stdin) == 0) {
+      return (0);
+    }
+
+    if (strcmp(buffer, "auth ") == 0) {
+      auth = (void (*)())malloc(4);
+      *(void**)auth = 0;
+
+      if (!strlen(&buffer[5]) < 0x1e) {
+        strcpy((char*)auth, &buffer[5]);
+      }
+    } else if (strcmp(buffer, "reset") == 0) {
+      free(auth);
+    } else if (strcmp(buffer, "service") == 0) {
+      service = (void (*)())strdup(&buffer[7]);
+    } else if (strcmp(buffer, "login") == 0) {
+      if (((uint8_t*)auth)[32] != 0) {
+        system("/bin/sh");
+      }
+    }
+    fwrite("Password:\n", 1, 10, stdout);
+  }
+  return (0);
+}
