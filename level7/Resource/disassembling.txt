@@ -1,0 +1,138 @@
+; main
+0x08048521 <+0>:	push   ebp                          ; prolog
+0x08048522 <+1>:	mov    ebp,esp                      ; prolog
+0x08048524 <+3>:	and    esp,0xfffffff0               ; stack alignement
+0x08048527 <+6>:	sub    esp,0x20                     ; sub the stack pointer by 32 bytes
+; -------------------------------------------------- ARG 1 (malloc x2)
+0x0804852a <+9>:	mov    DWORD PTR [esp],0x8          ; put 8 in the stack (esp + 0)
+0x08048531 <+16>:	call   0x80483f0 <malloc@plt>       ; call malloc to alloc memory on the heap
+                                                        ; [ARG 1] length of 8 bytes
+0x08048536 <+21>:	mov    DWORD PTR [esp+0x1c],eax     ; put the pointer from the return of malloc (eax)
+                                                        ; in the stack (esp + 28)
+0x0804853a <+25>:	mov    eax,DWORD PTR [esp+0x1c]     ; put the pointer from the return of malloc
+                                                        ; from the stack (esp + 28)
+0x0804853e <+29>:	mov    DWORD PTR [eax],0x1          ; put 1 in the first byte of the return of malloc
+0x08048544 <+35>:	mov    DWORD PTR [esp],0x8          ; put 8 in the stack (esp + 0)
+0x0804854b <+42>:	call   0x80483f0 <malloc@plt>       ; call malloc to alloc memory on the heap
+                                                        ; [ARG 1] length of 8 bytes
+0x08048550 <+47>:	mov    edx,eax                      ; put the return of malloc from eax in edx
+0x08048552 <+49>:	mov    eax,DWORD PTR [esp+0x1c]     ; put the pointer from the first return of malloc
+                                                        ; from the stack (esp + 28) in eax
+0x08048556 <+53>:	mov    DWORD PTR [eax+0x4],edx      ; put the address of the second return
+                                                        ; of malloc in the second byte of the
+                                                        ; first return of malloc
+; -------------------------------------------------- ARG 2 (malloc x2)
+0x08048559 <+56>:	mov    DWORD PTR [esp],0x8          ; put 8 in the stack (esp + 0)
+0x08048560 <+63>:	call   0x80483f0 <malloc@plt>       ; call malloc to alloc memory on the heap
+                                                        ; [ARG 1] length of 8 bytes
+0x08048565 <+68>:	mov    DWORD PTR [esp+0x18],eax     ; put the pointer from the return of the third malloc
+                                                        ; (eax) in the stack (esp + 24)
+0x08048569 <+72>:	mov    eax,DWORD PTR [esp+0x18]     ; put the pointer from the third return of malloc
+                                                        ; from the stack (esp + 24) in eax
+0x0804856d <+76>:	mov    DWORD PTR [eax],0x2          ; put 2 in the first byte of the return of malloc
+0x08048573 <+82>:	mov    DWORD PTR [esp],0x8          ; put 8 in the stack (esp + 0)
+0x0804857a <+89>:	call   0x80483f0 <malloc@plt>       ; call malloc to alloc memory on the heap
+                                                        ; [ARG 1] length of 8 bytes
+0x0804857f <+94>:	mov    edx,eax                      ; put the return of malloc from eax in edx
+0x08048581 <+96>:	mov    eax,DWORD PTR [esp+0x18]     ; put the pointer from the fourth return of malloc
+                                                        ; from the stack (esp + 24) in eax
+0x08048585 <+100>:	mov    DWORD PTR [eax+0x4],edx      ; put the address of the fourth return
+                                                        ; of malloc in the second byte of the
+                                                        ; third return of malloc
+; -------------------------------------------------- ARG 1 (strcpy argv[1])
+0x08048588 <+103>:	mov    eax,DWORD PTR [ebp+0xc]      ; mov the argv[0] argument from the
+                                                        ; stack (ebp + 12) in eax
+0x0804858b <+106>:	add    eax,0x4                      ; add 4 to eax for point on argv[1]
+0x0804858e <+109>:	mov    eax,DWORD PTR [eax]          ; dereference the eax (argv[1])
+0x08048590 <+111>:	mov    edx,eax                      ; put argv[1] from eax in edx
+0x08048592 <+113>:	mov    eax,DWORD PTR [esp+0x1c]     ; put the pointer from the return of the
+                                                        ; first malloc from the stack in eax
+0x08048596 <+117>:	mov    eax,DWORD PTR [eax+0x4]      ; put the pointer of the second return address of malloc
+                                                        ; saved in the second byte of the first return address
+                                                        ; of malloc in eax
+0x08048599 <+120>:	mov    DWORD PTR [esp+0x4],edx      ; put argv[1] from edx in the stack (esp + 4)
+0x0804859d <+124>:	mov    DWORD PTR [esp],eax          ; put the pointer of the second return addres of malloc
+                                                        ; from eax in the stack (esp + 0)
+0x080485a0 <+127>:	call   0x80483e0 <strcpy@plt>       ; call strcpy to copy the first malloc return
+                                                        ; [ARG 1] address returned from the second malloc (dest)
+                                                        ; [ARG 2] argv[1] (source)
+; -------------------------------------------------- ARG 2 (strcpy argv[2])
+0x080485a5 <+132>:	mov    eax,DWORD PTR [ebp+0xc]      ; mov the argv[0] argument from the
+                                                        ; stack (ebp + 12) in eax
+0x080485a8 <+135>:	add    eax,0x8                      ; add 8 to eax for point on argv[2]
+0x080485ab <+138>:	mov    eax,DWORD PTR [eax]          ; dereference the eax (argv[2])
+0x080485ad <+140>:	mov    edx,eax                      ; put argv[2] from eax in edx
+0x080485af <+142>:	mov    eax,DWORD PTR [esp+0x18]     ; put the pointer from the return of the
+                                                        ; third malloc from the stack in eax
+0x080485b3 <+146>:	mov    eax,DWORD PTR [eax+0x4]      ; put the pointer of the fourth return address of malloc
+                                                        ; saved in the second byte of the third return address
+                                                        ; of malloc in eax
+0x080485b6 <+149>:	mov    DWORD PTR [esp+0x4],edx      ; put argv[2] from edx in the stack (esp + 4)
+0x080485ba <+153>:	mov    DWORD PTR [esp],eax          ; put the pointer of the fourth return addres of malloc
+                                                        ; from eax in the stack (esp + 0)
+0x080485bd <+156>:	call   0x80483e0 <strcpy@plt>       ; call strcpy to copy the fourth malloc return
+                                                        ; [ARG 1] address returned from the fourth malloc (dest)
+                                                        ; [ARG 2] argv[2] (source)
+; -------------------------------------------------- read .pass file
+0x080485c2 <+161>:	mov    edx,0x80486e9                ; put the "r" string address from
+                                                        ; the section .text in edx
+                                                        ; x/s 0x80486e9 (to see the string)
+                                                        ; info files (to know where 0x80486e9 is from) (.text)
+0x080485c7 <+166>:	mov    eax,0x80486eb                ; put the "/home/user/level8/.pass" string
+                                                        ; address from the section .text in edx
+                                                        ; x/s 0x80486eb (to see the string)
+                                                        ; info files (to know where 0x80486eb is from) (.text)
+0x080485cc <+171>:	mov    DWORD PTR [esp+0x4],edx      ; put the "r" string address from edx
+                                                        ; in the stack (esp + 4)
+0x080485d0 <+175>:	mov    DWORD PTR [esp],eax          ; put the "r" string address from edx
+                                                        ; in the stack (esp + 0)
+0x080485d3 <+178>:	call   0x8048430 <fopen@plt>        ; call fopen to open a file
+                                                        ; [ARG 1] "/home/user/level8/.pass" string address
+                                                        ; [ARG 2] "r" string address
+0x080485d8 <+183>:	mov    DWORD PTR [esp+0x8],eax      ; put the file pointer returned from fopen
+                                                        ; in the stack (esp + 8)
+0x080485dc <+187>:	mov    DWORD PTR [esp+0x4],0x44     ; put 44 in the stack (esp + 4)
+0x080485e4 <+195>:	mov    DWORD PTR [esp],0x8049960    ; put the "" string address (global variable "c")
+                                                        ; from the .bss section in the stack (esp + 0)
+                                                        ; x/s 0x8049960 (to see the string)
+                                                        ; x/44x 0x8049960 (to see the 44 next bytes)
+                                                        ; info files (to know where 0x8049960 is from) (.bss)
+0x080485eb <+202>:	call   0x80483c0 <fgets@plt>        ; call fgets to read from the previously opened file
+                                                        ; [ARG 1] "" (global variable "c")
+                                                        ; [ARG 2] 44
+                                                        ; [ARG 3] opened file pointer
+0x080485f0 <+207>:	mov    DWORD PTR [esp],0x8048703    ; put the "~~" string address from the .rodata section
+                                                        ; in the stack (esp + 0)
+                                                        ; x/s 0x8048703 (to see the string)
+                                                        ; info files (to know where 0x8048703 is from) (.rodata)
+0x080485f7 <+214>:	call   0x8048400 <puts@plt>         ; call puts to print the string
+0x080485fc <+219>:	mov    eax,0x0                      ; put 0 in eax
+0x08048601 <+224>:	leave                               ; copy ebp to esp and pop ebp (epilogue)
+0x08048602 <+225>:	ret                                 ; return
+
+; m
+0x080484f4 <+0>:	push   ebp                              ; prolog
+0x080484f5 <+1>:	mov    ebp,esp                          ; prolog
+0x080484f7 <+3>:	sub    esp,0x18                         ; sub the stack pointer by 24 bytes
+0x080484fa <+6>:	mov    DWORD PTR [esp],0x0              ; put 0 in the stack (esp + 0)
+0x08048501 <+13>:	call   0x80483d0 <time@plt>             ; call time to get the number of seconds
+                                                            ; since the Epoch
+0x08048506 <+18>:	mov    edx,0x80486e0                    ; put the "%s - %d\n" string address from
+                                                            ; the .rodata section in edx
+                                                            ; x/s 0x80486e0 (to see the string)
+                                                            ; info files (to know where 0x80486e0 is from) (.rodata)
+0x0804850b <+23>:	mov    DWORD PTR [esp+0x8],eax          ; put the time as the number of seconds since the Epoch
+                                                            ; returned by the time call in the stack (esp + 8)
+0x0804850f <+27>:	mov    DWORD PTR [esp+0x4],0x8049960    ; put the string global variable "c"
+                                                            ; from the .bss section in the stack (esp + 0)
+                                                            ; x/s 0x8049960 (to see the string)
+                                                            ; x/44x 0x8049960 (to see the 44 next bytes)
+                                                            ; info files (to know where 0x8049960 is from) (.bss)
+0x08048517 <+35>:	mov    DWORD PTR [esp],edx              ; put the "%s - %d\n" string address from
+                                                            ; edx in the stack (esp + 0)
+0x0804851a <+38>:	call   0x80483b0 <printf@plt>           ; call printf to print in stdout
+                                                            ; [ARG 1] the "%s - %d\n" string address
+                                                            ; [ARG 2] the string global variable "c"
+                                                            ; [ARG 3] number of seconds since the Epoch
+0x0804851f <+43>:	leave                                   ; copy ebp to esp and pop ebp (epilogue)
+0x08048520 <+44>:	ret                                     ; return
