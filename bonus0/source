@@ -1,0 +1,39 @@
+#include <unistd.h>
+#include <string.h>
+#include <stdio.h>
+
+char* pp(char *s)
+{
+  char buf2[20];
+  char buf1[20];
+
+  p(buf1);
+  p(buf2);
+
+  strcpy(s, buf1);
+  s[strlen(s)] = ' ';
+
+  strcat(s, buf2);
+  return (s);
+}
+
+void p(char *s)
+{
+  char buffer[4096];
+  char *needle;
+  puts(" - ");
+
+  read(0, buffer, 4096);
+  *strchr(buffer, '\n') = 0;
+
+  strncpy(s, buffer, 20);
+}
+
+int main()
+{
+  char buffer[42];
+
+  pp(buffer);
+
+  puts(buffer);
+}
