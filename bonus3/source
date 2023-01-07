@@ -1,0 +1,30 @@
+#include <stdio.h>
+
+int main(int ac, char **av)
+{
+    char buf1[160];
+
+    FILE* ptr = fopen("/home/user/end/.pass", "r");
+    memset(buf1, 0x0, 21 * 4);
+
+    if (ptr != NULL && ac == 2)
+    {
+        fread(buf1, 1, 0x42, ptr);
+        buf1[0x41] = 0x0;
+
+        int n = atoi(av[1]);
+        buf1[n] = 0x0;
+
+        char *buf2 = buf1 + 0x42;
+        fread(buf2, 1, 0x41, ptr);
+        fclose(ptr);
+
+        if (strcmp(buf1, av[1]) == 0)
+        {
+            execl("/bin/sh", "sh", 0x0);
+            return (0);
+        }
+        puts(buf1 + 0x42);
+    }
+    return (0);
+}

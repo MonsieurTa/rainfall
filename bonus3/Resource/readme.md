@@ -45,7 +45,7 @@ Dump of assembler code for function main:
    0x080485a0 <+172>:	mov    DWORD PTR [esp+0x8],0x41
    0x080485a8 <+180>:	mov    DWORD PTR [esp+0x4],0x1
    0x080485b0 <+188>:	mov    DWORD PTR [esp],edx
-   0x080485b3 <+191>:	call   0x80483d0 <fread@plt>        ; read(buffer+42, 2, 0x41, buffer)
+   0x080485b3 <+191>:	call   0x80483d0 <fread@plt>        ; fread(buffer+42, 1, 0x41, ptr)
    0x080485b8 <+196>:	mov    eax,DWORD PTR [esp+0x9c]
    0x080485bf <+203>:	mov    DWORD PTR [esp],eax
    0x080485c2 <+206>:	call   0x80483c0 <fclose@plt>       ; fclose(ptr)
