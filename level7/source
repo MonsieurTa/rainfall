@@ -4,10 +4,14 @@
 #include <stdio.h>
 #include <time.h>
 
-void m()
+char c[45];                  // 0x8049960
+char *default_output = "~~"; // 0x8048703
+// puts.plt                  // 0x8049928
+
+void m() // 0x80484f4
 {
   time_t t = time(0x0);
-  printf("%s - %d\n", (char *)(0x08049960), t);
+  printf("%s - %d\n", c, t);
 }
 
 int main(int ac, char **av)
@@ -25,7 +29,7 @@ int main(int ac, char **av)
 
   FILE *fd = fopen("/home/user/level8/.pass", "r");
 
-  fgets((char *)(0x08049960), 0x44, fd);
-  puts("~~");
+  fgets(c, 0x44, fd);
+  puts(default_output); // ~~
   return (0);
 }

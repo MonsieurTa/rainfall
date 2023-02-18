@@ -1,6 +1,8 @@
 #include <stdlib.h>
 #include <stdio.h>
 
+int m = 0;
+
 void p(char *buffer) {
   printf(buffer);
 }
@@ -11,9 +13,8 @@ void n() {
   fgets(buffer, 512, stdin);
   p(buffer);
   if (m == 0x1025544) {
-    return;
+    system("/bin/cat /home/user/level5/.pass");
   }
-  system("/bin/cat /home/user/level5/.pass");
 }
 
 int main() {

